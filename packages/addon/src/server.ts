@@ -62,7 +62,7 @@ if (Settings.CUSTOM_CONFIGS) {
 
 // attempt to load the secret key
 try {
-  if (Settings.SECRET_KEY) loadSecretKey();
+  if (Settings.SECRET_KEY) loadSecretKey(true);
 } catch (error: any) {
   // determine command to run based on system OS
   const command =
@@ -131,7 +131,15 @@ app.get('/:config/configure', (req, res) => {
   }
   try {
     let configJson = extractJsonConfig(config);
-    if (isValueEncrypted(config)) {
+    let configString = config;
+    if (CUSTOM_CONFIGS) {
+      const customConfig = extractCustomConfig(config);
+      if (customConfig) {
+        configJson = customConfig;
+        configString = decodeURIComponent(CUSTOM_CONFIGS[config]);
+      }
+    }
+    if (isValueEncrypted(configString)) {
       logger.info(`Encrypted config detected, encrypting credentials`);
       configJson = encryptInfoInConfig(configJson);
     }

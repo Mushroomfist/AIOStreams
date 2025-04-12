@@ -497,16 +497,18 @@ export class AIOStreams {
       '╔═══════════════════════╤════════════╗',
       '║ Skip Reason           │ Count      ║',
       '╟───────────────────────┼────────────╢',
-      ...Object.entries(skipReasons).map(
-        ([reason, count]) =>
-          `║ ${reason.padEnd(21)} │ ${String(count).padStart(10)} ║`
-      ),
+      ...Object.entries(skipReasons)
+        .filter(([reason, count]) => count > 0)
+        .map(
+          ([reason, count]) =>
+            `║ ${reason.padEnd(21)} │ ${String(count).padStart(10)} ║`
+        ),
       '╟───────────────────────┼────────────╢',
       `║ Total Skipped         │ ${String(totalSkipped).padStart(10)} ║`,
       '╚═══════════════════════╧════════════╝',
     ];
 
-    logger.info('\n' + reportLines.join('\n'));
+    if (totalSkipped > 0) logger.info('\n' + reportLines.join('\n'));
 
     // Create stream objects
     const streamsStartTime = new Date().getTime();
